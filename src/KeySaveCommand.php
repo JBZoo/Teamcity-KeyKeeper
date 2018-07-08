@@ -32,7 +32,7 @@ class KeySaveCommand extends Command
             ->setName('key:save')
             ->addOption('name', null, InputOption::VALUE_REQUIRED, 'Name of key')
             ->addOption('value', null, InputOption::VALUE_REQUIRED, 'Value of key')
-            ->addOption('group', null, InputOption::VALUE_REQUIRED, 'Group of keys', 'default')
+            ->addOption('group', null, InputOption::VALUE_OPTIONAL, 'Group of keys', 'default')
             ->setDescription('Save key');
     }
 
