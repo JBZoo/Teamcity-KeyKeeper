@@ -30,9 +30,10 @@ class KeyRestoreCommand extends Command
     {
         $this
             ->setName('key:restore')
-            ->addOption('name', null, InputOption::VALUE_REQUIRED, 'Name of key')
-            ->addOption('group', null, InputOption::VALUE_REQUIRED, 'Group of keys', 'default')
-            ->setDescription('Restore key');
+            ->addOption('name', null, InputOption::VALUE_OPTIONAL, 'Name of key')
+            ->addOption('group', null, InputOption::VALUE_OPTIONAL, 'Group of keys', 'default')
+            ->addOption('all', null, InputOption::VALUE_NONE, 'Show all keys from group')
+            ->setDescription('Restore key in Teamcity format');
     }
 
     /**
@@ -40,14 +41,18 @@ class KeyRestoreCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $name = trim($input->getOption('name'));
         $group = trim($input->getOption('group'));
-
         $storageFile = PATH_STORAGE . "/{$group}.json";
-
         $storage = new JSON($storageFile);
-        $value = $storage->get($name);
 
-        $output->writeln("##teamcity[setParameter name='env.{$name}' value='{$value}']");
+        if (!$input->getOption('all')) {
+            $name = trim($input->getOption('name'));
+            $value = $storage->get($name);
+            $output->writeln("##teamcity[setParameter name='env.{$name}' value='{$value}']");
+        } else {
+            foreach ($storage->getArrayCopy() as $name => $value) {
+                $output->writeln("##teamcity[setParameter name='env.{$name}' value='{$value}']");
+            }
+        }
     }
 }

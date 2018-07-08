@@ -56,4 +56,16 @@ class KeyKeeperTest extends PHPUnit
         $restoreResult = trim(Cli::exec("php {$bin} key:restore --name='{$name}'"));
         isSame("##teamcity[setParameter name='env.{$name}' value='{$value}']", $restoreResult);
     }
+
+    public function testGetAllKeys()
+    {
+        $bin = realpath(__DIR__ . '/../bin/teamcity-keykeeper');
+
+        Cli::exec("php {$bin} key:save --name='key1' --value='value1'");
+        Cli::exec("php {$bin} key:save --name='key2' --value='value2'");
+
+        $restoreResult = trim(Cli::exec("php {$bin} key:restore --all"));
+        isContain("##teamcity[setParameter name='env.key1' value='value1']", $restoreResult);
+        isContain("##teamcity[setParameter name='env.key2' value='value2']", $restoreResult);
+    }
 }
