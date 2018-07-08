@@ -23,7 +23,22 @@ set_time_limit(0);
 define('PATH_ROOT', __DIR__ . '/../');
 define('PATH_STORAGE', PATH_ROOT . '/storage');
 
-require_once PATH_ROOT . '/vendor/autoload.php';
+$vendorPaths = [
+    realpath(__DIR__ . '/vendor/autoload.php'),
+    realpath(__DIR__ . '/../vendor/autoload.php'),
+    realpath(__DIR__ . '/../../vendor/autoload.php'),
+    realpath(__DIR__ . '/../../../vendor/autoload.php'),
+    realpath(__DIR__ . '/../../../../vendor/autoload.php'),
+    realpath(__DIR__ . '/../../../../../vendor/autoload.php'),
+    realpath('./vendor/autoload.php'),
+];
+
+foreach ($vendorPaths as $vendorPath) {
+    if (file_exists($vendorPath)) {
+        require_once $vendorPath;
+        break;
+    }
+}
 
 $application = new Application();
 $application->add(new KeySaveCommand());
