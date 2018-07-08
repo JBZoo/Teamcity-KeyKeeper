@@ -1,2 +1,9 @@
-/cache/
-/config/development/
+.idea
+/build
+/storage/*.json
+/logs
+/vendor
+/resources
+/phpunit.xml
+/phpunit-*.xml
+/composer.lock

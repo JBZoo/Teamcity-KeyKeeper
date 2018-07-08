@@ -1,0 +1,33 @@
+{
+    "name"              : "jbzoo/teamcity-keykeeper",
+    "type"              : "library",
+    "description"       : "Save and restore keys for Teamcity builds",
+    "license"           : "MIT",
+    "keywords"          : ["teamcity", "key keeper"],
+    "minimum-stability" : "stable",
+    "authors"           : [
+        {
+            "name"  : "SmetDenis",
+            "email" : "denis@jbzoo.com",
+            "role"  : "lead"
+        }
+    ],
+
+    "require"           : {
+        "php"             : ">=7.0",
+        "jbzoo/utils"     : "^2.2",
+        "symfony/process" : "^4.1",
+        "symfony/console" : "^4.1"
+    },
+
+    "require-dev"       : {
+        "jbzoo/phpunit"      : "^2.0",
+        "symfony/var-dumper" : "^4.1"
+    },
+
+    "autoload"          : {
+        "psr-4" : {
+            "JBZoo\\TeamcityKeyKeeper\\" : "src"
+        }
+    }
+}

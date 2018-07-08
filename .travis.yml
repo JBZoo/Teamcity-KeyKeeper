@@ -1,0 +1,11 @@
+language: php
+
+php:
+  - 7.2
+
+script:
+  - make
+  - make test-all
+
+after_success:
+  - make coveralls
