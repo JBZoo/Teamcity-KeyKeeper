@@ -33,9 +33,22 @@ class KeyKeeperTest extends PHPUnit
 
     public function testSaveAndRestoreKey()
     {
-        $bin = realpath(__DIR__ . '/../bin/cli.php');
+        $bin = realpath(__DIR__ . '/../bin/teamcity-keykeeper');
         $value = Str::random(10000);
         $name = Str::random();
+
+        $saveResult = trim(Cli::exec("php {$bin} key:save --name='{$name}' --value='{$value}'"));
+        isContain("Key '{$name}' saved", $saveResult);
+
+        $restoreResult = trim(Cli::exec("php {$bin} key:restore --name='{$name}'"));
+        isSame("##teamcity[setParameter name='env.{$name}' value='{$value}']", $restoreResult);
+    }
+
+    public function testSpecialChars()
+    {
+        $bin = realpath(__DIR__ . '/../bin/teamcity-keykeeper');
+        $value = 'qwerty1234567890-!@#$%^&*()_+.<>,;{}№';
+        $name = 'qwerty1234567890-!@#$%^&*()_+.<>,;{}№';
 
         $saveResult = trim(Cli::exec("php {$bin} key:save --name='{$name}' --value='{$value}'"));
         isContain("Key '{$name}' saved", $saveResult);

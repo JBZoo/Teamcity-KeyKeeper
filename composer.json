@@ -25,6 +25,10 @@
         "symfony/var-dumper" : "^4.1"
     },
 
+    "bin"               : [
+        "bin/teamcity-keykeeper"
+    ],
+
     "autoload"          : {
         "psr-4" : {
             "JBZoo\\TeamcityKeyKeeper\\" : "src"
