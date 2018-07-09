@@ -48,9 +48,11 @@ class KeyRestoreCommand extends Command
         if (!$input->getOption('all')) {
             $name = trim($input->getOption('name'));
             $value = $storage->get($name);
+            $name = strtoupper($name);
             $output->writeln("##teamcity[setParameter name='env.{$name}' value='{$value}']");
         } else {
             foreach ($storage->getArrayCopy() as $name => $value) {
+                $name = strtoupper($name);
                 $output->writeln("##teamcity[setParameter name='env.{$name}' value='{$value}']");
             }
         }

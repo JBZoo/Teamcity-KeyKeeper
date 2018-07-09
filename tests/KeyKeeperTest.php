@@ -41,6 +41,7 @@ class KeyKeeperTest extends PHPUnit
         isContain("Key '{$name}' saved", $saveResult);
 
         $restoreResult = trim(Cli::exec("php {$bin} key:restore --name='{$name}'"));
+        $name = strtoupper($name);
         isSame("##teamcity[setParameter name='env.{$name}' value='{$value}']", $restoreResult);
     }
 
@@ -54,6 +55,7 @@ class KeyKeeperTest extends PHPUnit
         isContain("Key '{$name}' saved", $saveResult);
 
         $restoreResult = trim(Cli::exec("php {$bin} key:restore --name='{$name}'"));
+        $name = strtoupper($name);
         isSame("##teamcity[setParameter name='env.{$name}' value='{$value}']", $restoreResult);
     }
 
@@ -65,8 +67,8 @@ class KeyKeeperTest extends PHPUnit
         Cli::exec("php {$bin} key:save --name='key2' --value='value2'");
 
         $restoreResult = trim(Cli::exec("php {$bin} key:restore --all"));
-        isContain("##teamcity[setParameter name='env.key1' value='value1']", $restoreResult);
-        isContain("##teamcity[setParameter name='env.key2' value='value2']", $restoreResult);
+        isContain("##teamcity[setParameter name='env.KEY1' value='value1']", $restoreResult);
+        isContain("##teamcity[setParameter name='env.KEY2' value='value2']", $restoreResult);
     }
 
     public function testRemoveKeysWithOption()
@@ -77,7 +79,7 @@ class KeyKeeperTest extends PHPUnit
         Cli::exec("php {$bin} key:save --name='key' --value=''");
 
         $restoreResult = trim(Cli::exec("php {$bin} key:restore --all"));
-        isContain("##teamcity[setParameter name='env.key' value='']", $restoreResult);
+        isContain("##teamcity[setParameter name='env.KEY' value='']", $restoreResult);
     }
 
     public function testRemoveKeysWithoutOption()
@@ -88,6 +90,6 @@ class KeyKeeperTest extends PHPUnit
         Cli::exec("php {$bin} key:save --name='key'");
 
         $restoreResult = trim(Cli::exec("php {$bin} key:restore --all"));
-        isContain("##teamcity[setParameter name='env.key' value='']", $restoreResult);
+        isContain("##teamcity[setParameter name='env.KEY' value='']", $restoreResult);
     }
 }
