@@ -14,7 +14,6 @@
 
 namespace JBZoo\TeamcityKeyKeeper;
 
-use JBZoo\Data\JSON;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -32,7 +31,7 @@ class KeySaveCommand extends Command
             ->setName('key:save')
             ->addOption('name', null, InputOption::VALUE_REQUIRED, 'Name of key')
             ->addOption('value', null, InputOption::VALUE_REQUIRED, 'Value of key')
-            ->addOption('group', null, InputOption::VALUE_OPTIONAL, 'Group of keys', 'default')
+            ->addOption('group', null, InputOption::VALUE_OPTIONAL, 'Group of keys', Helper::DEFAULT_GROUP)
             ->setDescription('Save key');
     }
 
@@ -41,16 +40,12 @@ class KeySaveCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $name = strtoupper(trim($input->getOption('name')));
-        $value = trim($input->getOption('value'));
-        $group = strtolower(trim($input->getOption('group')));
+        $message = Helper::saveKey(
+            $input->getOption('name'),
+            $input->getOption('value'),
+            $input->getOption('group')
+        );
 
-        $storageFile = PATH_STORAGE . "/{$group}.json";
-
-        $storage = new JSON(realpath($storageFile) ?: []);
-        $storage->set($name, $value);
-        file_put_contents($storageFile, $storage->__toString());
-
-        $output->writeln("Key '{$name}' saved");
+        $output->writeln($message);
     }
 }

@@ -28,6 +28,14 @@ class KeyKeeperTest extends PHPUnit
      */
     protected $bin = '';
 
+    public static function setUpBeforeClass()
+    {
+        $storageFile = __DIR__ . '/../storage/default_log.log';
+        if (file_exists($storageFile)) {
+            unlink($storageFile);
+        }
+    }
+
     public function setUp()
     {
         $storageFile = __DIR__ . '/../storage/default.json';

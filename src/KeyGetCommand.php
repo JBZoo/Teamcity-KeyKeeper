@@ -31,7 +31,7 @@ class KeyGetCommand extends Command
         $this
             ->setName('key:get')
             ->addOption('name', null, InputOption::VALUE_REQUIRED, 'Name of key')
-            ->addOption('group', null, InputOption::VALUE_OPTIONAL, 'Group of keys', 'default')
+            ->addOption('group', null, InputOption::VALUE_OPTIONAL, 'Group of keys', Helper::DEFAULT_GROUP)
             ->setDescription('Get clean value of key');
     }
 
@@ -40,10 +40,6 @@ class KeyGetCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $name = strtoupper(trim($input->getOption('name')));
-        $group = trim($input->getOption('group'));
-
-        $storage = new JSON(realpath(PATH_STORAGE . "/{$group}.json") ?: []);
-        $output->write(trim($storage->get($name)) ?: '');
+        $output->write(Helper::getKey($input->getOption('name'), $input->getOption('group')));
     }
 }

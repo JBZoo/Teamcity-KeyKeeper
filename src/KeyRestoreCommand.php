@@ -14,7 +14,6 @@
 
 namespace JBZoo\TeamcityKeyKeeper;
 
-use JBZoo\Data\JSON;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -31,7 +30,7 @@ class KeyRestoreCommand extends Command
         $this
             ->setName('key:restore')
             ->addOption('name', null, InputOption::VALUE_OPTIONAL, 'Name of key')
-            ->addOption('group', null, InputOption::VALUE_OPTIONAL, 'Group of keys', 'default')
+            ->addOption('group', null, InputOption::VALUE_OPTIONAL, 'Group of keys', Helper::DEFAULT_GROUP)
             ->addOption('all', null, InputOption::VALUE_NONE, 'Show all keys from group')
             ->setDescription('Restore key in Teamcity format');
     }
@@ -41,17 +40,15 @@ class KeyRestoreCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $group = trim($input->getOption('group'));
-        $storageFile = PATH_STORAGE . "/{$group}.json";
-        $storage = new JSON($storageFile);
+        $group = $input->getOption('group');
 
         if (!$input->getOption('all')) {
-            $name = strtoupper(trim($input->getOption('name')));
-            $value = $storage->get($name);
-            $output->writeln("##teamcity[setParameter name='env.{$name}' value='{$value}']");
+            $name = $input->getOption('name');
+            $output->writeln(Helper::tcMessage($name, $group));
         } else {
-            foreach ($storage->getArrayCopy() as $name => $value) {
-                $output->writeln("##teamcity[setParameter name='env.{$name}' value='{$value}']");
+            $rows = Helper::getKeys($group);
+            foreach ($rows as $name => $value) {
+                $output->writeln(Helper::tcMessage($name, $group));
             }
         }
     }
