@@ -41,7 +41,7 @@ class KeySaveCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $name = trim($input->getOption('name'));
+        $name = strtoupper(trim($input->getOption('name')));
         $value = trim($input->getOption('value'));
         $group = strtolower(trim($input->getOption('group')));
 

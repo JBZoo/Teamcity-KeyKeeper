@@ -23,73 +23,82 @@ use JBZoo\Utils\Str;
  */
 class KeyKeeperTest extends PHPUnit
 {
+    /**
+     * @var string
+     */
+    protected $bin = '';
+
     public function setUp()
     {
         $storageFile = __DIR__ . '/../storage/default.json';
         if (file_exists($storageFile)) {
             unlink($storageFile);
         }
+
+        $this->bin = 'php ' . realpath(__DIR__ . '/../bin/teamcity-keykeeper');
     }
 
     public function testSaveAndRestoreKey()
     {
-        $bin = realpath(__DIR__ . '/../bin/teamcity-keykeeper');
         $value = Str::random(10000);
         $name = Str::random();
 
-        $saveResult = trim(Cli::exec("php {$bin} key:save --name='{$name}' --value='{$value}'"));
+        $saveResult = trim(Cli::exec("{$this->bin} key:save --name='{$name}' --value='{$value}'"));
+        $name = strtoupper($name);
         isContain("Key '{$name}' saved", $saveResult);
 
-        $restoreResult = trim(Cli::exec("php {$bin} key:restore --name='{$name}'"));
-        $name = strtoupper($name);
+        $restoreResult = trim(Cli::exec("{$this->bin} key:restore --name='{$name}'"));
         isSame("##teamcity[setParameter name='env.{$name}' value='{$value}']", $restoreResult);
     }
 
     public function testSpecialChars()
     {
-        $bin = realpath(__DIR__ . '/../bin/teamcity-keykeeper');
         $value = 'qwerty1234567890-!@#$%^&*()_+.<>,;{}№';
-        $name = 'qwerty1234567890-!@#$%^&*()_+.<>,;{}№';
+        $name = 'qwerty1234567890';
 
-        $saveResult = trim(Cli::exec("php {$bin} key:save --name='{$name}' --value='{$value}'"));
+        $saveResult = trim(Cli::exec("{$this->bin} key:save", ['name' => $name, 'value' => $value]));
+        $name = strtoupper($name);
         isContain("Key '{$name}' saved", $saveResult);
 
-        $restoreResult = trim(Cli::exec("php {$bin} key:restore --name='{$name}'"));
-        $name = strtoupper($name);
+        $restoreResult = trim(Cli::exec("{$this->bin} key:restore", ['name' => $name]));
         isSame("##teamcity[setParameter name='env.{$name}' value='{$value}']", $restoreResult);
     }
 
     public function testGetAllKeys()
     {
-        $bin = realpath(__DIR__ . '/../bin/teamcity-keykeeper');
+        Cli::exec("{$this->bin} key:save --name='key1' --value='value1'");
+        Cli::exec("{$this->bin} key:save --name='key2' --value='value2'");
 
-        Cli::exec("php {$bin} key:save --name='key1' --value='value1'");
-        Cli::exec("php {$bin} key:save --name='key2' --value='value2'");
-
-        $restoreResult = trim(Cli::exec("php {$bin} key:restore --all"));
+        $restoreResult = trim(Cli::exec("{$this->bin} key:restore --all"));
         isContain("##teamcity[setParameter name='env.KEY1' value='value1']", $restoreResult);
         isContain("##teamcity[setParameter name='env.KEY2' value='value2']", $restoreResult);
     }
 
     public function testRemoveKeysWithOption()
     {
-        $bin = realpath(__DIR__ . '/../bin/teamcity-keykeeper');
+        Cli::exec("{$this->bin} key:save --name='key' --value='value1'");
+        Cli::exec("{$this->bin} key:save --name='key' --value=''");
 
-        Cli::exec("php {$bin} key:save --name='key' --value='value1'");
-        Cli::exec("php {$bin} key:save --name='key' --value=''");
-
-        $restoreResult = trim(Cli::exec("php {$bin} key:restore --all"));
+        $restoreResult = trim(Cli::exec("{$this->bin} key:restore --all"));
         isContain("##teamcity[setParameter name='env.KEY' value='']", $restoreResult);
     }
 
     public function testRemoveKeysWithoutOption()
     {
-        $bin = realpath(__DIR__ . '/../bin/teamcity-keykeeper');
+        Cli::exec("{$this->bin} key:save --name='key' --value='value1'");
+        Cli::exec("{$this->bin} key:save --name='key'");
 
-        Cli::exec("php {$bin} key:save --name='key' --value='value1'");
-        Cli::exec("php {$bin} key:save --name='key'");
-
-        $restoreResult = trim(Cli::exec("php {$bin} key:restore --all"));
+        $restoreResult = trim(Cli::exec("{$this->bin} key:restore --all"));
         isContain("##teamcity[setParameter name='env.KEY' value='']", $restoreResult);
+    }
+
+    public function testGetCleanValue()
+    {
+        $key = Str::random();
+        $value = 'qwerty1234567890-!@#$%^&*()_+.<>,;{}№\'"';
+
+        Cli::exec("{$this->bin} key:save", ['name' => $key, 'value' => $value]);
+
+        isSame($value, Cli::exec("{$this->bin} key:get --name='{$key}'"));
     }
 }

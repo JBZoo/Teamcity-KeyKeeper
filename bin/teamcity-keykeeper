@@ -13,6 +13,7 @@
  * @link       https://github.com/JBZoo/TeamcityKeyKeeper
  */
 
+use JBZoo\TeamcityKeyKeeper\KeyGetCommand;
 use JBZoo\TeamcityKeyKeeper\KeyRestoreCommand;
 use JBZoo\TeamcityKeyKeeper\KeySaveCommand;
 use Symfony\Component\Console\Application;
@@ -43,4 +44,5 @@ foreach ($vendorPaths as $vendorPath) {
 $application = new Application();
 $application->add(new KeySaveCommand());
 $application->add(new KeyRestoreCommand());
+$application->add(new KeyGetCommand());
 $application->run();

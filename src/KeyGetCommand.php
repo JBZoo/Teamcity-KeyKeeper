@@ -21,19 +21,18 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class KeyRestoreCommand
+ * Class KeyGetCommand
  * @package JBZoo\TeamcityKeyKeeper
  */
-class KeyRestoreCommand extends Command
+class KeyGetCommand extends Command
 {
     protected function configure()
     {
         $this
-            ->setName('key:restore')
-            ->addOption('name', null, InputOption::VALUE_OPTIONAL, 'Name of key')
+            ->setName('key:get')
+            ->addOption('name', null, InputOption::VALUE_REQUIRED, 'Name of key')
             ->addOption('group', null, InputOption::VALUE_OPTIONAL, 'Group of keys', 'default')
-            ->addOption('all', null, InputOption::VALUE_NONE, 'Show all keys from group')
-            ->setDescription('Restore key in Teamcity format');
+            ->setDescription('Get clean value of key');
     }
 
     /**
@@ -41,18 +40,10 @@ class KeyRestoreCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $name = strtoupper(trim($input->getOption('name')));
         $group = trim($input->getOption('group'));
-        $storageFile = PATH_STORAGE . "/{$group}.json";
-        $storage = new JSON($storageFile);
 
-        if (!$input->getOption('all')) {
-            $name = strtoupper(trim($input->getOption('name')));
-            $value = $storage->get($name);
-            $output->writeln("##teamcity[setParameter name='env.{$name}' value='{$value}']");
-        } else {
-            foreach ($storage->getArrayCopy() as $name => $value) {
-                $output->writeln("##teamcity[setParameter name='env.{$name}' value='{$value}']");
-            }
-        }
+        $storage = new JSON(realpath(PATH_STORAGE . "/{$group}.json") ?: []);
+        $output->write(trim($storage->get($name)) ?: '');
     }
 }
