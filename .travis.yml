@@ -6,6 +6,3 @@ php:
 script:
   - make
   - make test-all
-
-after_success:
-  - make coveralls

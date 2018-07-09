@@ -1,4 +1,4 @@
-# JBZoo TeamcityKeyKeeper
+# JBZoo TeamcityKeyKeeper [![Build Status](https://travis-ci.org/JBZoo/Teamcity-KeyKeeper.svg?branch=master)](https://travis-ci.org/JBZoo/Teamcity-KeyKeeper)
 
 
 ```sh
