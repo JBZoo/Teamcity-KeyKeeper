@@ -45,7 +45,7 @@ foreach ($vendorPaths as $vendorPath) {
 if ($homePath = Sys::getHome()) {
     define('PATH_STORAGE_DEFAULT', $homePath . '/.config/teamcity-keykeeper');
 } else {
-    define('PATH_STORAGE_DEFAULT', PATH_ROOT . '/storage');
+    define('PATH_STORAGE_DEFAULT', '/home/teamcity/.config/teamcity-keykeeper');
 }
 
 if (!is_dir(PATH_STORAGE_DEFAULT) &&
