@@ -16,6 +16,7 @@ namespace JBZoo\PHPUnit;
 
 use JBZoo\Utils\Cli;
 use JBZoo\Utils\Str;
+use JBZoo\Utils\Sys;
 
 /**
  * Class PackageTest
@@ -28,9 +29,11 @@ class KeyKeeperTest extends PHPUnit
      */
     protected $bin = '';
 
+    protected $testGroup = 'phpunit';
+
     public static function setUpBeforeClass()
     {
-        $storageFile = __DIR__ . '/../storage/default_log.log';
+        $storageFile = Sys::getHome() . '/.teamcity-keykeeper/phpuni_log.log';
         if (file_exists($storageFile)) {
             unlink($storageFile);
         }
@@ -38,7 +41,7 @@ class KeyKeeperTest extends PHPUnit
 
     public function setUp()
     {
-        $storageFile = __DIR__ . '/../storage/default.json';
+        $storageFile = Sys::getHome() . '/.teamcity-keykeeper/phpunit.json';
         if (file_exists($storageFile)) {
             unlink($storageFile);
         }
@@ -51,11 +54,13 @@ class KeyKeeperTest extends PHPUnit
         $value = Str::random(10000);
         $name = Str::random();
 
-        $saveResult = trim(Cli::exec("{$this->bin} key:save --name='{$name}' --value='{$value}'"));
+        $saveResult = trim(Cli::exec("{$this->bin} key:save " .
+            "--name='{$name}' --value='{$value}' --group='{$this->testGroup}'"
+        ));
         $name = strtoupper($name);
         isContain("Key '{$name}' saved", $saveResult);
 
-        $restoreResult = trim(Cli::exec("{$this->bin} key:restore --name='{$name}'"));
+        $restoreResult = trim(Cli::exec("{$this->bin} key:restore --name='{$name}' --group='{$this->testGroup}'"));
         isSame("##teamcity[setParameter name='env.{$name}' value='{$value}']", $restoreResult);
     }
 
@@ -64,39 +69,44 @@ class KeyKeeperTest extends PHPUnit
         $value = 'qwerty1234567890-!@#$%^&*()_+.<>,;{}№';
         $name = 'qwerty1234567890';
 
-        $saveResult = trim(Cli::exec("{$this->bin} key:save", ['name' => $name, 'value' => $value]));
+        $saveResult = trim(Cli::exec("{$this->bin} key:save", [
+            'group' => $this->testGroup,
+            'name'  => $name,
+            'value' => $value,
+        ]));
+
         $name = strtoupper($name);
         isContain("Key '{$name}' saved", $saveResult);
 
-        $restoreResult = trim(Cli::exec("{$this->bin} key:restore", ['name' => $name]));
+        $restoreResult = trim(Cli::exec("{$this->bin} key:restore", ['name' => $name, 'group' => $this->testGroup]));
         isSame("##teamcity[setParameter name='env.{$name}' value='{$value}']", $restoreResult);
     }
 
     public function testGetAllKeys()
     {
-        Cli::exec("{$this->bin} key:save --name='key1' --value='value1'");
-        Cli::exec("{$this->bin} key:save --name='key2' --value='value2'");
+        Cli::exec("{$this->bin} key:save --name='key1' --value='value1' --group='{$this->testGroup}'");
+        Cli::exec("{$this->bin} key:save --name='key2' --value='value2' --group='{$this->testGroup}'");
 
-        $restoreResult = trim(Cli::exec("{$this->bin} key:restore --all"));
+        $restoreResult = trim(Cli::exec("{$this->bin} key:restore --all --group='{$this->testGroup}'"));
         isContain("##teamcity[setParameter name='env.KEY1' value='value1']", $restoreResult);
         isContain("##teamcity[setParameter name='env.KEY2' value='value2']", $restoreResult);
     }
 
     public function testRemoveKeysWithOption()
     {
-        Cli::exec("{$this->bin} key:save --name='key' --value='value1'");
-        Cli::exec("{$this->bin} key:save --name='key' --value=''");
+        Cli::exec("{$this->bin} key:save --name='key' --value='value1' --group='{$this->testGroup}'");
+        Cli::exec("{$this->bin} key:save --name='key' --value='' --group='{$this->testGroup}'");
 
-        $restoreResult = trim(Cli::exec("{$this->bin} key:restore --all"));
+        $restoreResult = trim(Cli::exec("{$this->bin} key:restore --all --group='{$this->testGroup}'"));
         isContain("##teamcity[setParameter name='env.KEY' value='']", $restoreResult);
     }
 
     public function testRemoveKeysWithoutOption()
     {
-        Cli::exec("{$this->bin} key:save --name='key' --value='value1'");
-        Cli::exec("{$this->bin} key:save --name='key'");
+        Cli::exec("{$this->bin} key:save --name='key' --value='value1' --group='{$this->testGroup}'");
+        Cli::exec("{$this->bin} key:save --name='key' --group='{$this->testGroup}'");
 
-        $restoreResult = trim(Cli::exec("{$this->bin} key:restore --all"));
+        $restoreResult = trim(Cli::exec("{$this->bin} key:restore --all --group='{$this->testGroup}'"));
         isContain("##teamcity[setParameter name='env.KEY' value='']", $restoreResult);
     }
 
@@ -105,8 +115,8 @@ class KeyKeeperTest extends PHPUnit
         $key = Str::random();
         $value = 'qwerty1234567890-!@#$%^&*()_+.<>,;{}№\'"';
 
-        Cli::exec("{$this->bin} key:save", ['name' => $key, 'value' => $value]);
+        Cli::exec("{$this->bin} key:save", ['name' => $key, 'value' => $value, 'group' => $this->testGroup]);
 
-        isSame($value, Cli::exec("{$this->bin} key:get --name='{$key}'"));
+        isSame($value, Cli::exec("{$this->bin} key:get --name='{$key}' --group='{$this->testGroup}'"));
     }
 }

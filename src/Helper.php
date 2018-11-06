@@ -22,7 +22,7 @@ use JBZoo\Data\JSON;
  */
 class Helper
 {
-    public const DEFAULT_GROUP = 'default';
+    const DEFAULT_GROUP = 'default';
 
     /**
      * @param string $key
@@ -86,7 +86,7 @@ class Helper
     private static function getStoragePath($group)
     {
         $group = self::cleanGroup($group);
-        return PATH_STORAGE . "/{$group}.json";
+        return PATH_STORAGE_DEFAULT . "/{$group}.json";
     }
 
     /**
@@ -127,7 +127,7 @@ class Helper
     {
         $group = self::cleanGroup($group);
         /** @noinspection ForgottenDebugOutputInspection */
-        error_log(date('Y-m-d H:i:s') . "    {$message}\n", 3, PATH_STORAGE . "/{$group}_log.log");
+        error_log(date('Y-m-d H:i:s') . "    {$message}\n", 3, PATH_STORAGE_DEFAULT . "/{$group}_log.log");
     }
 
     /**

@@ -21,8 +21,9 @@
     },
 
     "require-dev"       : {
-        "jbzoo/phpunit"      : "^2.0",
-        "symfony/var-dumper" : "^4.1"
+        "jbzoo/phpunit"         : "^2.0",
+        "symfony/var-dumper"    : "^4.1",
+        "quickbooks/v3-php-sdk" : "^5.0.3"
     },
 
     "bin"               : [

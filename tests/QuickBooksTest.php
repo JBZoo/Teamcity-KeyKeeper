@@ -12,15 +12,19 @@
  * @link       https://github.com/JBZoo/TeamcityKeyKeeper
  */
 
+namespace JBZoo\PHPUnit;
 
-if (!defined('ROOT_PATH')) { // for PHPUnit process isolation
-    define('ROOT_PATH', realpath('.'));
-}
+use JBZoo\Utils\Cli;
 
-// main autoload
-if ($autoload = realpath('./vendor/autoload.php')) {
-    require_once $autoload;
-} else {
-    echo 'Please execute "composer update" !' . PHP_EOL;
-    exit(1);
+/**
+ * Class QuickBooksTest
+ * @package JBZoo\PHPUnit
+ */
+class QuickBooksTest extends PHPUnit
+{
+    public function testUpdate()
+    {
+        $saveResult = Cli::exec('teamcity-keykeeper qb:update');
+        isContain("DON'T TOUCH IT! IT'S FOR CI!", $saveResult);
+    }
 }

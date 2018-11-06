@@ -16,33 +16,32 @@
 use JBZoo\TeamcityKeyKeeper\KeyGetCommand;
 use JBZoo\TeamcityKeyKeeper\KeyRestoreCommand;
 use JBZoo\TeamcityKeyKeeper\KeySaveCommand;
+use JBZoo\TeamcityKeyKeeper\QbUpdateCommand;
+use JBZoo\Utils\Sys;
 use Symfony\Component\Console\Application;
 
 umask(0000);
 set_time_limit(0);
 
-define('PATH_ROOT', __DIR__ . '/../');
-define('PATH_STORAGE', PATH_ROOT . '/storage');
+define('PATH_ROOT', dirname(__DIR__) . '/');
+require_once PATH_ROOT . '/vendor/autoload.php';
 
-$vendorPaths = [
-    realpath(__DIR__ . '/vendor/autoload.php'),
-    realpath(__DIR__ . '/../vendor/autoload.php'),
-    realpath(__DIR__ . '/../../vendor/autoload.php'),
-    realpath(__DIR__ . '/../../../vendor/autoload.php'),
-    realpath(__DIR__ . '/../../../../vendor/autoload.php'),
-    realpath(__DIR__ . '/../../../../../vendor/autoload.php'),
-    realpath('./vendor/autoload.php'),
-];
+if ($homePath = Sys::getHome()) {
+    define('PATH_STORAGE_DEFAULT', $homePath . '/.teamcity-keykeeper');
+} else {
+    define('PATH_STORAGE_DEFAULT', PATH_ROOT . '/storage');
+}
 
-foreach ($vendorPaths as $vendorPath) {
-    if (file_exists($vendorPath)) {
-        require_once $vendorPath;
-        break;
-    }
+if (!is_dir(PATH_STORAGE_DEFAULT) &&
+    !mkdir($concurrentDirectory = PATH_STORAGE_DEFAULT, 0777, true) &&
+    !is_dir($concurrentDirectory)
+) {
+    throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
 }
 
 $application = new Application();
 $application->add(new KeySaveCommand());
 $application->add(new KeyRestoreCommand());
 $application->add(new KeyGetCommand());
+$application->add(new QbUpdateCommand());
 $application->run();
