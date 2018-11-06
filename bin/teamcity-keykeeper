@@ -42,7 +42,7 @@ foreach ($vendorPaths as $vendorPath) {
     }
 }
 
-if ($homePath = Sys::getHome()) {
+if ($homePath = @Sys::getHome()) {
     define('PATH_STORAGE_DEFAULT', $homePath . '/.config/teamcity-keykeeper');
 } else {
     define('PATH_STORAGE_DEFAULT', '/home/teamcity/.config/teamcity-keykeeper');
