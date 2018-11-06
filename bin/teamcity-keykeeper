@@ -27,7 +27,7 @@ define('PATH_ROOT', dirname(__DIR__) . '/');
 require_once PATH_ROOT . '/vendor/autoload.php';
 
 if ($homePath = Sys::getHome()) {
-    define('PATH_STORAGE_DEFAULT', $homePath . '/.teamcity-keykeeper');
+    define('PATH_STORAGE_DEFAULT', $homePath . '/.config/teamcity-keykeeper');
 } else {
     define('PATH_STORAGE_DEFAULT', PATH_ROOT . '/storage');
 }
